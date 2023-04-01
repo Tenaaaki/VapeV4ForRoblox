@@ -2263,60 +2263,6 @@ GuiLibrary["RemoveObject"]("FullbrightOptionsButton")
 GuiLibrary["RemoveObject"]("HighJumpOptionsButton")
 
 runcode(function()
-local infJumpConnection
-local infjump = {["Enabled"] = false}
-infjump = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
-    Name = "InfiniteJump",
-    HoverText = "Jump without touching ground",
-    Function = function(callback) 
-        if callback then    
-            infJumpConnection = uis.InputBegan:Connect(function(input)
-                if input.KeyCode == Enum.KeyCode.Space and not uis:GetFocusedTextBox() then
-                    if InfHold.Enabled and entity.isAlive then 
-                        repeat 
-                        lplr.Character:WaitForChild("Humanoid"):ChangeState("Jumping")
-                        task.wait()
-                        until not uis:IsKeyDown(Enum.KeyCode.Space) or not infjump.Enabled or not InfHold.Enabled or uis:GetFocusedTextBox()
-                    else 
-                        if entity.isAlive then 
-                                lplr.Character:WaitForChild("Humanoid"):ChangeState("Jumping")
-                            end 
-                        end 
-                    end
-                end)
-            else
-                if infJumpConnection then
-                    infJumpConnection:Disconnect()
-                end
-            end
-        end
-    })
-    InfHold = infjump.CreateToggle({
-        ["Name"] = "Hold",
-        ["HoverText"] = "Hold down space to jump?",
-        ["Function"] = function() end
-    })
-end)
-
-local mcleaderboard = GuiLibrary["ObjectsThatCanBeSaved"]["WorldWindow"]["Api"].CreateOptionsButton({
-	Name = "MC Statistics",
-	Function = function(callback)
-		if callback then
-		  loadstring(game:HttpGet("https://raw.githubusercontent.com/sstvskids/minecraft_easyggscoreboard/main/scoreboard"))()
-		end
-	  end
-	 })
-
-local keystrokestroll = GuiLibrary["ObjectsThatCanBeSaved"]["WorldWindow"]["Api"].CreateOptionsButton({
-	Name = "CPS & WASD Keystrokes",
-	Function = function(callback)
-		if callback then
-		  loadstring(game:HttpGet("https://raw.githubusercontent.com/sstvskids/keystrokes/main/strokes"))()
-		end
-	  end
-	 })
-
-runcode(function()
 	local Confetti = {Enabled = false}
 	Confetti = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
 		Name = "ConfettiExploit",
@@ -2324,112 +2270,192 @@ runcode(function()
 			if callback then 
 				task.spawn(function()
 					repeat 
-						task.wait(0.001) 
+						task.wait(0.1) 
 game:GetService("ReplicatedStorage"):WaitForChild("events-@easy-games/game-core:shared/game-core-networking@getEvents.Events"):WaitForChild("useAbility"):FireServer("PARTY_POPPER")
 					until (not Confetti.Enabled)
 				end)
 			end
 		end,
-HoverText = "Confetti Exploit"
+HoverText = "happy 7th birthday"
 	})
 end)
 
-
-
 runcode(function()
-	local PurpleAntivoid = {["Enabled"] = false}
-	local antivoidpart
-	PurpleAntivoid = GuiLibrary["ObjectsThatCanBeSaved"]["UtilityWindow"]["Api"].CreateOptionsButton({
-		Name = "SolidAntiVoid",
-		HoverText = "Antivoid but it is solid insted of teleporting you back",
-		Function = function(callback)
-			if callback then
-				task.spawn(function()
-					antivoidpart = Instance.new("Part")
-					antivoidpart.Size = Vector3.new(2100, 0.5, 2000)
-					antivoidpart.Position = Vector3.new(160.5, 25, 247.5)
-					antivoidpart.Transparency = 0.4
-					antivoidpart.Anchored = true
-					antivoidpart.Color = Color3.fromRGB(255, 255, 255)
-					antivoidpart.Parent = workspace
-				end)
-			else               
-				if antivoidpart then
-					antivoidpart:Remove()
-					antivoidpart = nil
-				end
-			end
-		end
-	})
-end)
+    local deb
+    local con
+    local client = require(game:GetService("ReplicatedStorage"):WaitForChild("TS"):WaitForChild("remotes")).default.Client
+    local lplr = game:GetService("Players").LocalPlayer
 
-
-runcode(function()
-	local Chat = {["Enabled"] = false}
-	Chat = GuiLibrary["ObjectsThatCanBeSaved"]["RenderWindow"]["Api"].CreateOptionsButton({
-		Name = "Chat",
-		HoverText = "Moves the Chat",
-		Function = function(callback)
-			if callback then
-				game:GetService("StarterGui"):SetCore('ChatWindowPosition', UDim2.new(0, 0, 0.7, 0))
-			else
-				game:GetService("StarterGui"):SetCore('ChatWindowPosition', UDim2.new(0, 0, 0, 0))
-			end
-		end
-	})
-end)
-
-
-
-runcode(function()
-    local KillFeed = {["Enabled"] = false}
-    local container
-
-    KillFeed = GuiLibrary["ObjectsThatCanBeSaved"]["RenderWindow"]["Api"].CreateOptionsButton({
-        Name = "KillFeed",
-        HoverText = "Destroys the KillFeed",
-        Function = function(callback)
-            if callback then
-                task.spawn(function()
-                    if container == nil then
-                        repeat
-                            local suc, res = pcall(function() return lplr.PlayerGui.KillFeedGui.KillFeedContainer end)
-                            if suc then
-                                container = res
-                            end
-                            task.wait()
-                        until container ~= nil
-                    end
-                    container.Visible = false
-                end)
-            else
-                if container then
-                    container.Visible = true
+    function fetchBed()
+        local selectedBed
+        for _, bed in next, workspace:GetChildren() do
+            if bed.Name == "bed" and not selectedBed then
+                local covers = bed:WaitForChild("Covers")
+                
+                if lplr.TeamColor ~= covers.BrickColor then
+                    selectedBed = bed
                 end
             end
         end
+        return (selectedBed)
+    end
+
+    deb = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
+        Name = "BedTP", 
+        Function = function(callback)
+            if callback then
+				createwarning("BedTP", "Teleported!", 1.2)
+                lplr = game:GetService("Players").LocalPlayer
+                chr = lplr.Character
+
+                if lplr and chr then
+                    local bed = fetchBed()
+                    local tppos2 = bed.Position + Vector3.new(0, 10, 0)
+                    local hum = chr:FindFirstChildWhichIsA("Humanoid")
+                    con = lplr.CharacterAdded:Connect(function(chr)
+                        con:Disconnect()
+                        task.wait(.5)
+                        local root = chr:WaitForChild("HumanoidRootPart")
+                        local check = (lplr:GetAttribute("LastTeleported") - lplr:GetAttribute("SpawnTime")) < 1
+                        con = game:GetService("RunService").Heartbeat:Connect(function(dt)
+                            local dist = ((check and 700 or 1200) * dt)
+                                        if (tppos2 - root.CFrame.p).Magnitude > dist then
+                                            root.CFrame = root.CFrame + (tppos2 - root.CFrame.p).Unit * dist
+                                            local yes = (tppos2 - root.CFrame.p).Unit * 20
+                                            root.Velocity = Vector3.new(yes.X, root.Velocity.Y, yes.Z)
+                                        else
+                                            root.CFrame = root.CFrame + (tppos2 - root.CFrame.p)
+                                        end
+                        end)
+
+                        repeat
+                            task.wait()
+                        until (tppos2 - root.CFrame.p).Magnitude < 10
+
+                        con:Disconnect()
+                    end)
+
+                    for _ = 1, 10, 1 do
+                        hum:ChangeState(Enum.HumanoidStateType.Dead)
+                        hum.Health = 0
+                    end
+                    -- client:Get("ResetCharacter"):SendToServer()
+                end
+                deb.ToggleButton(false)
+            end
+        end,
+        HoverText = "Bed TP or teleportation to a random bed",
     })
 end)
 
+
+
+
+local void = GuiLibrary["ObjectsThatCanBeSaved"]["RenderWindow"]["Api"].CreateOptionsButton({
+    ["Name"] = "Salad's Texture Pack ",
+    ["Function"] = function(callback)
+        if callback then
+            local Settings = {
+                Resize = true, --false if not resize, true if resize
+                ResizeNum = 1, --default is 1
+                Color = Color3.fromRGB(102, 51, 153), --put rgb color here
+                LoadTime = 1 --to prevent not working
+            }
+            
+            repeat task.wait() until game:IsLoaded()
+            local bwgames = {6872274481,8444591321,8560631822}
+            if not table.find(bwgames,game.PlaceId) then return end
+            task.wait(Settings.LoadTime)
+            local cam = game:GetService("Workspace").Camera
+            cam:WaitForChild("Viewmodel")
+            cam.Viewmodel.ChildAdded:Connect(function(model)
+                if model:FindFirstChild("Handle") then
+                    local handle = model:FindFirstChild("Handle")
+                    local name = string.lower(model.Name)
+                    if Settings.Resize == true then
+                        handle.Size = handle.Size / Settings.ResizeNum
+                    end
+                    handle.Material = Enum.Material.Glass
+                    handle.TextureID = ""
+                    handle.Color = Settings.Color
+                    if name:find("sword") then
+                        handle.MeshId = "rbxassetid://11216117592"
+                    elseif name:find("snowball") then
+                        handle.MeshId = "rbxassetid://11216343798"
+                    end
+                end
+            end)
+        end
+end
+})
+
+
+
+
+
+
+CustomSpaceSky = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
+    ["Name"] = "GalaxySky",
+    ["Function"] = function(callback)
+        if callback then
+			game.Lighting.Sky.SkyboxBk = "http://www.roblox.com/asset/?id=159454299"
+            game.Lighting.Sky.SkyboxDn = "http://www.roblox.com/asset/?id=159454296"
+            game.Lighting.Sky.SkyboxFt = "http://www.roblox.com/asset/?id=159454293"
+            game.Lighting.Sky.SkyboxLf = "http://www.roblox.com/asset/?id=159454286"
+            game.Lighting.Sky.SkyboxRt = "http://www.roblox.com/asset/?id=159454300"
+            game.Lighting.Sky.SkyboxUp = "http://www.roblox.com/asset/?id=159454288"
+            game.Lighting.FogColor = Color3.new(236, 88, 241)
+            game.Lighting.FogEnd = "200"
+            game.Lighting.FogStart = "0"
+            game.Lighting.Ambient = Color3.new(0.5, 0, 1)
+        else
+			game.Lighting.Sky.SkyboxBk = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxDn = "http://www.roblox.com/asset/?id=6334928194"
+            game.Lighting.Sky.SkyboxFt = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxLf = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxRt = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxUp = "http://www.roblox.com/asset/?id=7018689553"
+            game.Lighting.FogColor = Color3.new(1, 1, 1)
+            game.Lighting.FogEnd = "10000"
+            game.Lighting.FogStart = "0"
+            game.Lighting.Ambient = Color3.new(0, 0, 0)
+        end
+    end
+})
+
+
 runcode(function()
-    local CFrameHighJump = {["Enabled"] = false}
-    CFrameHighJump = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
-        Name = "CFrameHighJump",
-        HoverText = "DISABLE GRAVITY",
-        Function  = function(callback)
+	local nokillfeed = {Enabled = false}
+	nokillfeed = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
+		Name = "NoKillFeed",
+		Function = function(callback)
+			if callback then 
+				task.spawn(function()
+lplr.PlayerGui.KillFeedGui.Parent = game.Workspace
+				end)
+else
+game.Workspace.KillFeedGui.Parent = lplr.PlayerGui
+			end
+		end,
+HoverText = "removes killfeed"
+	})
+end)
+
+
+runcode(function()
+    local GravityHighJump = {["Enabled"] = false}
+    GravityHighJump = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
+        ["Name"] = "FlyBypass",
+        ["HoverText"] = "Bypasses Ac most of the time.",
+        ["Function"] = function(callback)
             if callback then
                 if entity.isAlive then
-                    workspace.Gravity = 0
-                    entity.character.HumanoidRootPart.CFrame -= Vector3.new(0, 2, 0)
                     task.spawn(function()
-                        repeat
-                            if not CFrameHighJump["Enabled"] then break end
-                            if not entity.isAlive then break end
-                            workspace.Gravity = 0
-                            entity.character.HumanoidRootPart.CFrame += Vector3.new(0, 5, 0)
-                            task.wait(0.05)
-                            entity.character.HumanoidRootPart.CFrame += Vector3.new(0, 3, 0)
-                        until not CFrameHighJump["Enabled"]
+                        workspace.Gravity = 10
+                        entity.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                        entity.character.HumanoidRootPart.CFrame = entity.character.HumanoidRootPart.CFrame + Vector3.new(0, 15, 0)
+                        task.wait(2)
+                        workspace.Gravity = 196.2
                     end)
                 end
             else
@@ -2439,83 +2465,64 @@ runcode(function()
     })
 end)
 
+
 runcode(function()
-    local NameHider = {["Enabled"] = true}
-    local fakeplr = {["Name"] = "Piracy Owner", ["UserId"] = "239702688"}
-    local otherfakeplayers = {["Name"] = "Skids", ["UserId"] = "1"}
-
-    local function plrthing(obj, property)
-        for i,v in pairs(game:GetService("Players"):GetChildren()) do
-            if v ~= lplr then
-                obj[property] = obj[property]:gsub(v.Name, otherfakeplayers["Name"])
-                obj[property] = obj[property]:gsub(v.DisplayName, otherfakeplayers["Name"])
-                obj[property] = obj[property]:gsub(v.UserId, otherfakeplayers["UserId"])
-            else
-                obj[property] = obj[property]:gsub(v.Name, fakeplr["Name"])
-                obj[property] = obj[property]:gsub(v.DisplayName, fakeplr["Name"])
-                obj[property] = obj[property]:gsub(v.UserId, fakeplr["UserId"])
-            end
-        end
-    end
-
-    local function newobj(v)
-        if v:IsA("TextLabel") or v:IsA("TextButton") then
-            plrthing(v, "Text")
-            v:GetPropertyChangedSignal("Text"):connect(function()
-                plrthing(v, "Text")
-            end)
-        end
-        if v:IsA("ImageLabel") then
-            plrthing(v, "Image")
-            v:GetPropertyChangedSignal("Image"):connect(function()
-                plrthing(v, "Image")
-            end)
-        end
-    end
-
-    NameHider = GuiLibrary["ObjectsThatCanBeSaved"]["UtilityWindow"]["Api"].CreateOptionsButton({
-        Name = "NameHider",
-        HoverText = "Disable TargetHud (And Don't Use Nametags)",
-        Function = function(callback)
+    local Chat = {["Enabled"] = false}
+    Chat = GuiLibrary["ObjectsThatCanBeSaved"]["RenderWindow"]["Api"].CreateOptionsButton({
+        ["Name"] = "ChatAngle",
+        ["HoverText"] = "Moves the Chat Posision",
+        ["Function"] = function(callback)
             if callback then
-                for i,v in pairs(game:GetDescendants()) do
-                    newobj(v)
-                end
-                game.DescendantAdded:connect(newobj, obj)
+                game:GetService("StarterGui"):SetCore('ChatWindowPosition', UDim2.new(0, 0, 0.7, 0))
             else
-                createwarning("Piracy V4", "Join A New Match To Reset Your Name And Other Names.", 3)
+                game:GetService("StarterGui"):SetCore('ChatWindowPosition', UDim2.new(0, 0, 0, 0))
             end
         end
     })
 end)
 
+
+
 runcode(function()
-    local Lowhop = {["Enabled"] = false}
-    Lowhop = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
-        Name = "LowhopSpeed",
-        HoverText = "Use With Vape Speed",
-        Function = function(callback)
-        if callback then
-            task.spawn(function()           
-                repeat
-					task.wait()
-                    if not Lowhop["Enabled"] then break end
-                    if not entity.isAlive then
-						continue
-					end
-                    if longjumping or (GuiLibrary["ObjectsThatCanBeSaved"]["SpeedAutoJumpToggle"]["Api"]["Enabled"] and (shared.killauranear or GuiLibrary["ObjectsThatCanBeSaved"]["SpeedAlways JumpToggle"]["Api"]["Enabled"])) or GuiLibrary["ObjectsThatCanBeSaved"]["ScaffoldOptionsButton"]["Api"]["Enabled"] or GuiLibrary["ObjectsThatCanBeSaved"]["FlyOptionsButton"]["Api"]["Enabled"] then
-						continue
-					end
-					entity.character.HumanoidRootPart.CFrame += Vector3.new(0, 0.45, 0)
-					task.wait(0.16)
-                until not Lowhop["Enabled"]
-            end)
-        else
-            workspace.Gravity = 196.2
-      	end
-      end
+    local Chat = {["Enabled"] = false}
+    Chat = GuiLibrary["ObjectsThatCanBeSaved"]["WorldWindow"]["Api"].CreateOptionsButton({
+        ["Name"] = "VapePrivateShader",
+        ["HoverText"] = "Moves the Chat Posision",
+        ["Function"] = function(callback)
+            if callback then
+           loadstring(game:HttpGet("https://raw.githubusercontent.com/leakedzfuneral/Nuked-V4-Texture/main/Texture", true))()
+            end
+        end
     })
 end)
+
+
+
+	runcode(function()
+		local BetterHighJump = {["Enabled"] = false}
+		BetterHighJump = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
+			["Name"] = "BetterHighJump",
+			["Function"] = function(callback)
+				if callback then
+					BetterHighJump["ToggleButton"](false)
+					task.spawn(function()
+						local chr = entity.character
+						chr.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+						wait(0.4)
+						for i = 1,6 do
+							chr.HumanoidRootPart.Velocity = Vector3.new(chr.HumanoidRootPart.Velocity.X,i*51,chr.HumanoidRootPart.Velocity.Z)
+							game:GetService("RunService").Stepped:Wait()
+							if i % 2 == 0 then
+								game:GetService("RunService").Stepped:Wait()
+							end
+						end
+					end)
+				end
+			end,
+			["HoverText"] = "Highjump Bypass"
+		})
+	end)
+
 
 runcode(function()
 	  local TPAura = {["Enabled"] = false}
@@ -2576,7 +2583,7 @@ runcode(function()
 			end)
             end
         end,
-        ["HoverText"] = "Found By Xzyn (requires bow + arrows)"
+        ["HoverText"] = "(requires bow + arrows)"
     })
 cam = TPAura.CreateToggle({
 		Name = "NoCamera",
@@ -2585,19 +2592,61 @@ cam = TPAura.CreateToggle({
 	})
 end)
 
-local BlockExploit = {["Enabled"] = false}
-BlockExploit = GuiLibrary["ObjectsThatCanBeSaved"]["UtilityWindow"]["Api"].CreateOptionsButton({
-	Name = "BlockExploit",
-	HoverText = "Allows You To Place Blocks Anywhere",
-	Function = function(callback)
-		if callback then
-			PlaceAnywhere = true
-			UserInputService.InputBegan:Connect(onInputBegan)
-			createwarning("Piracy ", "You Can Now Place Blocks Anywhere", 3)
-
-		else
-			PlaceAnywhere = false
-			UserInputService.InputBegan:Connect(onInputBegan)
-		end
-	end
+CustomSpaceSky = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
+    ["Name"] = "CustomSpaceSky",
+    ["Function"] = function(callback)
+        if callback then
+			game.Lighting.Sky.SkyboxBk = "http://www.roblox.com/asset/?id=159454299"
+            game.Lighting.Sky.SkyboxDn = "http://www.roblox.com/asset/?id=159454296"
+            game.Lighting.Sky.SkyboxFt = "http://www.roblox.com/asset/?id=159454293"
+            game.Lighting.Sky.SkyboxLf = "http://www.roblox.com/asset/?id=159454286"
+            game.Lighting.Sky.SkyboxRt = "http://www.roblox.com/asset/?id=159454300"
+            game.Lighting.Sky.SkyboxUp = "http://www.roblox.com/asset/?id=159454288"
+            game.Lighting.FogColor = Color3.new(236, 88, 241)
+            game.Lighting.FogEnd = "200"
+            game.Lighting.FogStart = "0"
+            game.Lighting.Ambient = Color3.new(0.5, 0, 1)
+        else
+			game.Lighting.Sky.SkyboxBk = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxDn = "http://www.roblox.com/asset/?id=6334928194"
+            game.Lighting.Sky.SkyboxFt = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxLf = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxRt = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxUp = "http://www.roblox.com/asset/?id=7018689553"
+            game.Lighting.FogColor = Color3.new(1, 1, 1)
+            game.Lighting.FogEnd = "10000"
+            game.Lighting.FogStart = "0"
+            game.Lighting.Ambient = Color3.new(0, 0, 0)
+        end
+    end
 })
+
+PinkMountainSky = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
+    ["Name"] = "PinkMountainSky",
+    ["Function"] = function(callback)
+        if callback then
+			game.Lighting.Sky.SkyboxBk = "http://www.roblox.com/asset/?id=160188495"
+            game.Lighting.Sky.SkyboxDn = "http://www.roblox.com/asset/?id=160188614"
+            game.Lighting.Sky.SkyboxFt = "http://www.roblox.com/asset/?id=160188609"
+            game.Lighting.Sky.SkyboxLf = "http://www.roblox.com/asset/?id=160188589"
+            game.Lighting.Sky.SkyboxRt = "http://www.roblox.com/asset/?id=160188597"
+            game.Lighting.Sky.SkyboxUp = "http://www.roblox.com/asset/?id=160188588"
+            game.Lighting.FogColor = Color3.new(236, 88, 241)
+            game.Lighting.FogEnd = "200"
+            game.Lighting.FogStart = "0"
+            game.Lighting.Ambient = Color3.new(0.5, 0, 1)
+        else
+			game.Lighting.Sky.SkyboxBk = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxDn = "http://www.roblox.com/asset/?id=6334928194"
+            game.Lighting.Sky.SkyboxFt = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxLf = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxRt = "http://www.roblox.com/asset/?id=7018684000"
+            game.Lighting.Sky.SkyboxUp = "http://www.roblox.com/asset/?id=7018689553"
+            game.Lighting.FogColor = Color3.new(1, 1, 1)
+            game.Lighting.FogEnd = "10000"
+            game.Lighting.FogStart = "0"
+            game.Lighting.Ambient = Color3.new(0, 0, 0)
+        end
+    end
+})
+
